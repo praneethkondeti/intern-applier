@@ -1,0 +1,182 @@
+{
+  "name": "Intern applier",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1oULDcENAeFZfKnsnWn8wF4kAsru6uzgrb5r6RvUdKrI",
+          "mode": "list",
+          "cachedResultName": "Intern Applier",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oULDcENAeFZfKnsnWn8wF4kAsru6uzgrb5r6RvUdKrI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oULDcENAeFZfKnsnWn8wF4kAsru6uzgrb5r6RvUdKrI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        16
+      ],
+      "id": "a398e128-7f79-47a7-b02e-f4a9cf3604df",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "xd0PGMuJyvpzzAsp",
+          "name": "Google Sheets Trigger account 901"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a B.Tech student applying for a software development internship. Given your name, the internship role you're applying for, and optionally your Details, experience, and skills — write a short, polite, confident and ready-to-send email introducing yourself and expressing interest in the internship opportunity. Keep the tone enthusiastic but formal. Mention that you're eager to learn and contribute, and that you're looking forward to hearing back. End the email with a thank you and your name. Use \"Dear Hiring Manager\" as the greeting. Do not include any placeholder text, brackets, or variables that need to be filled in. The email should be complete and ready to send as-is. Here is your information: Name:  {{ $json['Full Name'] }} to:  {{ $json.Email }} Internship Role:  {{ $json['Position Applied'] }} Details:  {{ $json.Details }} Experience:  {{ $json['Experience (Years)'] }} Skills:{{ $json.Skills }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "="
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4aeac7ba-b71c-46fb-947e-f3a5ced412ad",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "ea54fe33-5610-4f7b-b8a3-671d357789e9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "NNKzhKmGyLdlFA6g",
+          "name": "Google Gemini(PaLM) Api account 3059"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"to\": \"hr@examplecompany.com\",\n  \"subject\": \"Application for Frontend Developer Internship\",\n  \"body\": \"Dear HR Team,\\n\\nI hope this message finds you well. My name is Ananya Reddy, and I am currently pursuing my B.Tech. I am writing to express my interest in the Frontend Developer Internship position at your company.\\n\\nI'm learning HTML, CSS, and JavaScript, and I’m excited to build web apps and strengthen my development skills. Although I have about 0.5 years of hands-on practice, I am eager to contribute, learn, and grow in a real-world development environment.\\n\\nThank you for considering my application. I look forward to the opportunity to contribute and learn as part of your team.\\n\\nBest regards,\\nAnanya Reddy\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        192
+      ],
+      "id": "ecb2802f-1162-49a1-88b0-607bf3c13cc0",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.output.to }}",
+        "subject": "={{ $json.output.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "d7ddd6c7-7b2f-4364-990a-fc9d77bf893f",
+      "name": "Send a message",
+      "webhookId": "93c872a2-913a-4d67-91b9-2dec601f66dc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fx7Pw9C1TmTm7f4t",
+          "name": "Gmail account 1135"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0927f25e-0cbe-44c8-a876-b63feba2e646",
+  "meta": {
+    "instanceId": "969257b09ad2942bbaff2e2288304f4969030574d109cdeca05bf11f630884df"
+  },
+  "id": "Qz1Hciruq0557zdu",
+  "tags": []
+}

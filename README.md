@@ -29,10 +29,6 @@ The workflow does the following:
 
 The workflow is connected to this spreadsheet:
 
-- Spreadsheet ID: 1oULDcENAeFZfKnsnWn8wF4kAsru6uzgrb5r6RvUdKrI
-- Sheet name: Sheet1
-- Sheet link: https://docs.google.com/spreadsheets/d/1oULDcENAeFZfKnsnWn8wF4kAsru6uzgrb5r6RvUdKrI/edit#gid=0
-
 This sheet is used as the trigger source for new application entries.
 
 ## Authentication details
